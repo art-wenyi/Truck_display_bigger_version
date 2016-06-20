@@ -1,0 +1,1 @@
+"./Display.obj" "./I2C.obj" "./main.obj" "./msp430_uart.obj" "../lnk_msp430f5659.cmd" -l"libc.a" -l"libmath.a" 
