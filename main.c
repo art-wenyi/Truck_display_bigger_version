@@ -51,7 +51,6 @@ char gps_velocity_buff[8] = {""};			// store the velocity chars buffer
 int gps_velocity_buff_count = 0;			// count the valid chars in gep velocity
 
 void clearBufferAndStatus();         // just clear buffer and status
-void displayProcess();               // display the screen
 void transmitGpsVelocity(int gps_vel_kilo);
 int getGpsVelocity();
 
@@ -94,19 +93,19 @@ void main(void)
 			SFRIFG1 &= ~OFIFG; // Clear fault flags
 		} while (SFRIFG1 & OFIFG); // Test oscillator fault flag
 
+		//== clock init finished, below are the main function ==
+
   Uart_Init(9600, 'n', 'l', '8', 1);		  // init uart 1
   UartA2_Init(9600, 'n', 'l', '8', 1);		  // init uart 2
   Display_Initial();                         // init display
   int delay=0;
-  for(delay=0;delay<10;delay++) __delay_cycles(640000);        // just a delay, add if u want
+  for(delay=0;delay<10;delay++) __delay_cycles(80000);        // just a delay, add if u want
   displayVelocity(000);                 // start from 000 speed
   //__bis_SR_register(LPM0_bits + GIE);       // Enter LPM0, interrupts enabled
   __no_operation();                         // For debugger
 
   int gps_velocity_kilometer = 0;
-
-
-   int loop_tmp=0;                // c language can't init this variables in loop
+  int loop_tmp=0;                // c language can't init this variables in loop
   while(1){
 	  //while(cmd_recv_cnt<18) _NOP();      // wait for the buffer get filled
 	  if(cmd_recv_cnt>=18){
@@ -239,70 +238,32 @@ void main(void)
 				  }
 			  }
 
-			  displayProcess(disp_left_status, disp_right_status, disp_car_status, disp_people_status, disp_velocity_status, velocity);
+			  displayProcess(disp_left_status, disp_right_status, disp_car_status, disp_people_status, disp_velocity_status, velocity);  // display on screen
 			  _nop();
 
 		  }
 	  }
-	  // gps route
+	  // gps route, 2 times info get per second
 	  if(gps_velocity_ready == 1){
 		  gps_velocity_buff_count = gps_velocity_count;
 		  gps_velocity_count = 0;
 		  Uart_disableRXINT();               // disable uart receiver before processing
 		  UartA2_disableRXINT();               // disable uart receiver before processing
 		  for(loop_tmp=0;loop_tmp<8;loop_tmp++){
-			  gps_velocity_buff[loop_tmp] = gps_velocity[loop_tmp];
+			  gps_velocity_buff[loop_tmp] = gps_velocity[loop_tmp];			// store the gps info in to buffer
 		  }
 		  Uart_enableRXINT();               // reable uart receiver before processing
 		  UartA2_enableRXINT();               // reable uart receiver before processing
 		  gps_velocity_kilometer = getGpsVelocity();
 		  displayVelocity(gps_velocity_kilometer);
-		  gps_velocity_ready = 0;
+		  transmitGpsVelocity(gps_velocity_kilometer);
+		  gps_velocity_ready = 0;					// reset velocity ready flag, in order to read velocity speed once again
 	  }
   }
 
 }
 
-void displayProcess(int leftside, int rightside, int car_flag, int people_flag, int velocity_flag, int velocity){   // i didn't use velocity_flag actually, just update all the time
-	if(people_flag==2){                        // people has the top priority to be displayed
-		if(leftside==2){
-			displayPeopleWithLeftSide();
-			return;
-		}else if(rightside==2){
-			displayPeopleWithRightSide();
-			return;
-		}else{
-			displayPeopleOnly();
-			return;
-		}
-	}
 
-	if(car_flag==2){                          // car next
-		if(leftside==2){
-			displayCarWithLeftSide();
-			return;
-		}else if(rightside==2){
-			displayCarWithRightSide();
-			return;
-		}else{
-			displayCarOnly();
-			return;
-		}
-	}
-
-	if(leftside==2){						// left side only
-		displayLeftSideOnly();
-		return;
-	}
-
-	if(rightside==2){						// right side only
-		displayRightSideOnly();
-		return;
-	}
-
-	displayVelocity(velocity);						// default , display velocity
-	//for(tt=0;tt<50;tt++) __delay_cycles(80000);        // just a delay, add if u want
-}
 
 void clearBufferAndStatus(){         // sorry for the name, at the end it won't clear status, it saves the previous one until it changes
 	  operation_mode = 'd';			// totally 6 types, 'c' for car, 'p' for people, 'l' for left, 'r' for right, 'v' for velocity, 'd' for default, do nothing
@@ -456,7 +417,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) TIMER1_A0_ISR (void)
   beep_gap += 1;
   if(disp_car_status ==2 || disp_people_status==2){
 	  if(beep_gap<500)
-	  	  P4OUT ^= BIT4;                            // Toggle P1.0
+	  	  P4OUT ^= BIT4;                            // Toggle P4.4
 	  else
 	  	  P4OUT = 0;
 	  beep_gap = beep_gap % 1000;

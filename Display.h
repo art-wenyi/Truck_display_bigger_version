@@ -56,6 +56,6 @@ void displayPeopleWithLeftSide();
 void displayPeopleWithRightSide();
 void displayLeftSideOnly();
 void displayRightSideOnly();
-
+void displayProcess(int leftside, int rightside, int car_flag, int people_flag, int velocity_flag, int velocity);
 
 #endif /* DISPLAY_H_ */

@@ -378,6 +378,48 @@ void displayMiddle(int car_flag, int people_flag, int velocity_flag, int velocit
 }
 
 */
+
+void displayProcess(int leftside, int rightside, int car_flag, int people_flag, int velocity_flag, int velocity){   // i didn't use velocity_flag actually, just update all the time
+	if(people_flag==2){                        // people has the top priority to be displayed
+		if(leftside==2){
+			displayPeopleWithLeftSide();
+			return;
+		}else if(rightside==2){
+			displayPeopleWithRightSide();
+			return;
+		}else{
+			displayPeopleOnly();
+			return;
+		}
+	}
+
+	if(car_flag==2){                          // car next
+		if(leftside==2){
+			displayCarWithLeftSide();
+			return;
+		}else if(rightside==2){
+			displayCarWithRightSide();
+			return;
+		}else{
+			displayCarOnly();
+			return;
+		}
+	}
+
+	if(leftside==2){						// left side only
+		displayLeftSideOnly();
+		return;
+	}
+
+	if(rightside==2){						// right side only
+		displayRightSideOnly();
+		return;
+	}
+
+	displayVelocity(velocity);						// default , display velocity
+	//for(tt=0;tt<50;tt++) __delay_cycles(80000);        // just a delay, add if u want
+}
+
 void display1Byte(unsigned char data){                             // just for display 1 byte blank on display
 	I2C_Write_Packet_To_Display(0x40,0x01,data);
 	__delay_cycles(400);           //8MhzÏÂÃ¿¸öÏÔÊ¾ÑÓ³Ù²»ÄÜµÍÓÚ300£¬·ñÔòÁ¢±À
