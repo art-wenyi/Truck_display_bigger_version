@@ -1,10 +1,10 @@
 ******************************************************************************
                   MSP430 Linker PC v4.3.3                      
 ******************************************************************************
->> Linked Tue Jun 14 12:33:38 2016
+>> Linked Mon Jun 20 18:04:33 2016
 
 OUTPUT FILE NAME:   <f5659_car_people_disp2.out>
-ENTRY POINT SYMBOL: "_c_int00"  address: 000080f4
+ENTRY POINT SYMBOL: "_c_int00"  address: 000081c2
 
 
 MEMORY CONFIGURATION
@@ -19,8 +19,8 @@ MEMORY CONFIGURATION
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
   USBRAM                00001c00   00000800  00000000  00000800  RWIX
-  RAM                   00002400   00004000  000002fb  00003d05  RWIX
-  FLASH                 00008000   00007f80  0000034e  00007c32  RWIX
+  RAM                   00002400   00004000  00000324  00003cdc  RWIX
+  FLASH                 00008000   00007f80  00000420  00007b60  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
   INT02                 0000ff84   00000002  00000000  00000002  RWIX
@@ -85,7 +85,7 @@ MEMORY CONFIGURATION
   INT61                 0000fffa   00000002  00000002  00000000  RWIX
   INT62                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   00078000  000012a6  00076d5a  RWIX
+  FLASH2                00010000   00078000  00001eaa  00076156  RWIX
   RAM2                  000f0000   0000c000  00000000  0000c000  RWIX
 
 
@@ -97,60 +97,65 @@ section   page    origin      length       input sections
 .init_array 
 *          0    00008000    00000000     UNINITIALIZED
 
-.data      0    00002400    00000258     UNINITIALIZED
+.data      0    00002400    00000280     UNINITIALIZED
                   00002400    00000060     Display.obj (.data:CAR_YES)
                   00002460    0000004c     Display.obj (.data:PED_YES)
-                  000024ac    00000020     Display.obj (.data:NUM_0)
-                  000024cc    00000020     Display.obj (.data:NUM_1)
-                  000024ec    00000020     Display.obj (.data:NUM_2)
-                  0000250c    00000020     Display.obj (.data:NUM_3)
-                  0000252c    00000020     Display.obj (.data:NUM_4)
-                  0000254c    00000020     Display.obj (.data:NUM_5)
-                  0000256c    00000020     Display.obj (.data:NUM_6)
-                  0000258c    00000020     Display.obj (.data:NUM_7)
-                  000025ac    00000020     Display.obj (.data:NUM_8)
-                  000025cc    00000020     Display.obj (.data:NUM_9)
-                  000025ec    0000001c     main.obj (.data)
-                  00002608    00000014     Display.obj (.data:SIDE_LANE_LEFT)
-                  0000261c    00000014     Display.obj (.data:SIDE_LANE_RIGHT)
-                  00002630    00000012     main.obj (.data:cmd_buff)
-                  00002642    00000012     main.obj (.data:cmd_recv)
-                  00002654    00000003     main.obj (.data:velocity_status)
-                  00002657    00000001     I2C.obj (.data)
+                  000024ac    0000002e     main.obj (.data)
+                  000024da    00000020     Display.obj (.data:NUM_0)
+                  000024fa    00000020     Display.obj (.data:NUM_1)
+                  0000251a    00000020     Display.obj (.data:NUM_2)
+                  0000253a    00000020     Display.obj (.data:NUM_3)
+                  0000255a    00000020     Display.obj (.data:NUM_4)
+                  0000257a    00000020     Display.obj (.data:NUM_5)
+                  0000259a    00000020     Display.obj (.data:NUM_6)
+                  000025ba    00000020     Display.obj (.data:NUM_7)
+                  000025da    00000020     Display.obj (.data:NUM_8)
+                  000025fa    00000020     Display.obj (.data:NUM_9)
+                  0000261a    00000014     Display.obj (.data:SIDE_LANE_LEFT)
+                  0000262e    00000014     Display.obj (.data:SIDE_LANE_RIGHT)
+                  00002642    00000012     main.obj (.data:cmd_buff)
+                  00002654    00000012     main.obj (.data:cmd_recv)
+                  00002666    00000008     main.obj (.data:gps_velocity)
+                  0000266e    00000008     main.obj (.data:gps_velocity_buff)
+                  00002676    00000006     main.obj (.data:gps_tag)
+                  0000267c    00000003     main.obj (.data:velocity_status)
+                  0000267f    00000001     I2C.obj (.data)
 
 .TI.persistent 
 *          0    00002400    00000000     UNINITIALIZED
 
-.bss       0    00002658    00000003     UNINITIALIZED
-                  00002658    00000002     (.common:TxDataBuff)
-                  0000265a    00000001     (.common:TXByteCtr)
+.bss       0    00002680    00000004     UNINITIALIZED
+                  00002680    00000002     (.common:TxDataBuff)
+                  00002682    00000001     (.common:TXByteCtr)
+                  00002683    00000001     (.common:gps_recv_char)
 
 .TI.noinit 
-*          0    00002658    00000000     UNINITIALIZED
+*          0    00002680    00000000     UNINITIALIZED
 
 .stack     0    00006360    000000a0     UNINITIALIZED
                   00006360    00000004     rts430x_lc_rd_eabi.lib : boot.obj (.stack)
                   00006364    0000009c     --HOLE--
 
 .text:_isr 
-*          0    00008000    0000010e     
-                  00008000    00000070     main.obj (.text:_isr:USCI_A0_ISR)
-                  00008070    00000044     I2C.obj (.text:_isr:USCI_I2C_Display_ISR)
-                  000080b4    00000040     main.obj (.text:_isr:TIMER1_A0_ISR)
-                  000080f4    0000001a     rts430x_lc_rd_eabi.lib : boot.obj (.text:_isr:_c_int00_noexit)
+*          0    00008000    000001dc     
+                  00008000    000000ce     main.obj (.text:_isr:USCI_A2_ISR)
+                  000080ce    00000070     main.obj (.text:_isr:USCI_A0_ISR)
+                  0000813e    00000044     I2C.obj (.text:_isr:USCI_I2C_Display_ISR)
+                  00008182    00000040     main.obj (.text:_isr:TIMER1_A0_ISR)
+                  000081c2    0000001a     rts430x_lc_rd_eabi.lib : boot.obj (.text:_isr:_c_int00_noexit)
 
-.cinit     0    0000810e    00000240     
-                  0000810e    0000021d     (.cinit..data.load) [load image, compression = rle]
-                  0000832b    00000001     --HOLE-- [fill = 0]
-                  0000832c    0000000c     (__TI_handler_table)
-                  00008338    00000006     (.cinit..bss.load) [load image, compression = zero_init]
-                  0000833e    00000010     (__TI_cinit_table)
+.cinit     0    000081dc    00000244     
+                  000081dc    00000221     (.cinit..data.load) [load image, compression = rle]
+                  000083fd    00000001     --HOLE-- [fill = 0]
+                  000083fe    0000000c     (__TI_handler_table)
+                  0000840a    00000006     (.cinit..bss.load) [load image, compression = zero_init]
+                  00008410    00000010     (__TI_cinit_table)
 
 USCI_B2    0    0000ffc6    00000002     
                   0000ffc6    00000002     rts430x_lc_rd_eabi.lib : int35.obj (.int35)
 
 USCI_A2    0    0000ffc8    00000002     
-                  0000ffc8    00000002     rts430x_lc_rd_eabi.lib : int36.obj (.int36)
+                  0000ffc8    00000002     main.obj (.int36)
 
 PORT4      0    0000ffca    00000002     
                   0000ffca    00000002     rts430x_lc_rd_eabi.lib : int37.obj (.int37)
@@ -238,84 +243,105 @@ SYSNMI     0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.obj (.reset)
 
-.text      0    00010000    000012a6     
-                  00010000    00000430     main.obj (.text:main)
-                  00010430    000001d6     Display.obj (.text:displayVelocity)
-                  00010606    00000108     Display.obj (.text:Display_Initial)
-                  0001070e    00000094     msp430_uart.obj (.text:Uart_Init)
-                  000107a2    0000007a     Display.obj (.text:numberMapping)
-                  0001081c    0000006e     rts430x_lc_rd_eabi.lib : autoinit.obj (.text:_auto_init_hold_wdt)
-                  0001088a    00000062                            : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
-                  000108ec    00000062     Display.obj (.text:displayCar)
-                  0001094e    00000062     Display.obj (.text:displayPeople)
-                  000109b0    0000005e     I2C.obj (.text:I2C_Master_Display_Init)
-                  00010a0e    0000005e     Display.obj (.text:displayLeftSide)
-                  00010a6c    0000005e     Display.obj (.text:displayRightSide)
-                  00010aca    0000005c     main.obj (.text:displayProcess)
-                  00010b26    00000058     rts430x_lc_rd_eabi.lib : div32u.obj (.text)
-                  00010b7e    00000048     Display.obj (.text:Clear_RAM)
-                  00010bc6    00000042     Display.obj (.text:Set_Column_Address)
-                  00010c08    00000042     Display.obj (.text:displayCarOnly)
-                  00010c4a    00000040     msp430_uart.obj (.text:Uart_setParity)
-                  00010c8a    00000040     Display.obj (.text:displayPeopleWithRightSide)
-                  00010cca    0000003e     rts430x_lc_rd_eabi.lib : lsr32.obj (.text:l_lsr_const)
-                  00010d08    0000003c     Display.obj (.text:displayPeopleOnly)
-                  00010d44    0000003c     Display.obj (.text:displayPeopleWithLeftSide)
-                  00010d80    0000003a     I2C.obj (.text:I2C_Write_Packet_To_Display)
-                  00010dba    0000003a     Display.obj (.text:Set_Addressing_Mode)
-                  00010df4    0000003a     Display.obj (.text:Set_Charge_Pump)
-                  00010e2e    0000003a     Display.obj (.text:Set_Common_Config)
-                  00010e68    0000003a     Display.obj (.text:Set_Contrast_Control)
-                  00010ea2    0000003a     Display.obj (.text:Set_Display_Clock)
-                  00010edc    0000003a     Display.obj (.text:Set_Display_Offset)
-                  00010f16    0000003a     Display.obj (.text:Set_Multiplex_Ratio)
-                  00010f50    0000003a     Display.obj (.text:Set_Precharge_Period)
-                  00010f8a    0000003a     Display.obj (.text:Set_VCOMH)
-                  00010fc4    00000030     Display.obj (.text:displayBlankLine)
-                  00010ff4    0000002c     rts430x_lc_rd_eabi.lib : div16s.obj (.text)
-                  00011020    00000026     msp430_uart.obj (.text:Uart_setLMSBMode)
-                  00011046    00000026     Display.obj (.text:displayCarWithLeftSide)
-                  0001106c    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
-                  00011090    00000022     Display.obj (.text:displayLeftSideOnly)
-                  000110b2    00000020     Display.obj (.text:displayCarWithRightSide)
-                  000110d2    00000020     Display.obj (.text:displayRightSideOnly)
-                  000110f2    0000001e     Display.obj (.text:Set_Page_Address)
-                  00011110    0000001e     Display.obj (.text:Set_Start_Line)
-                  0001112e    0000001a     Display.obj (.text:Set_Common_Remap)
-                  00011148    0000001a     Display.obj (.text:Set_Display_On_Off)
-                  00011162    0000001a     Display.obj (.text:Set_Entire_Display)
-                  0001117c    0000001a     Display.obj (.text:Set_Inverse_Display)
-                  00011196    0000001a     Display.obj (.text:Set_Segment_Remap)
-                  000111b0    0000001a     msp430_uart.obj (.text:Uart_setbitMode)
-                  000111ca    0000001a     Display.obj (.text:display1Byte)
-                  000111e4    00000016     msp430_uart.obj (.text:Uart_setstopbitMode)
-                  000111fa    00000016     main.obj (.text:clearBufferAndStatus)
-                  00011210    00000016     rts430x_lc_rd_eabi.lib : div16u.obj (.text)
-                  00011226    00000016                            : mult16_f5hw.obj (.text)
-                  0001123c    00000014                            : memcpy.obj (.text:memcpy)
-                  00011250    00000012     Display.obj (.text:Turn_Display_On)
-                  00011262    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
-                  00011274    00000006     I2C.obj (.text:I2C_Display_Disable)
-                  0001127a    00000006     I2C.obj (.text:I2C_Display_Enable)
-                  00011280    00000006     I2C.obj (.text:I2C_Display_Interrupt_Enable)
-                  00011286    00000006     msp430_uart.obj (.text:Uart_disableRXINT)
-                  0001128c    00000006     msp430_uart.obj (.text:Uart_enableRXINT)
-                  00011292    00000006     rts430x_lc_rd_eabi.lib : isr_trap.obj (.text:__TI_ISR_TRAP)
-                  00011298    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
-                  0001129e    00000004                            : pre_init.obj (.text:_system_pre_init)
-                  000112a2    00000004                            : exit.obj (.text:abort)
+.text      0    00010000    00001eaa     
+                  00010000    00000492     main.obj (.text:main)
+                  00010492    000002e4     rts430x_lc_rd_eabi.lib : frcmpyd.obj (.text:__TI_frcmpyd)
+                  00010776    00000282                            : mpyd.obj (.text:__mspabi_mpyd)
+                  000109f8    000001e4     Display.obj (.text:displayVelocity)
+                  00010bdc    00000130     rts430x_lc_rd_eabi.lib : fs_add.obj (.text)
+                  00010d0c    00000108     Display.obj (.text:Display_Initial)
+                  00010e14    000000d8     main.obj (.text:getGpsVelocity)
+                  00010eec    000000b6     rts430x_lc_rd_eabi.lib : fs_mpy.obj (.text)
+                  00010fa2    00000094     msp430_uart.obj (.text:Uart_Init)
+                  00011036    0000008e     rts430x_lc_rd_eabi.lib : fs_div.obj (.text)
+                  000110c4    0000007a     Display.obj (.text:numberMapping)
+                  0001113e    0000006e     rts430x_lc_rd_eabi.lib : autoinit.obj (.text:_auto_init_hold_wdt)
+                  000111ac    0000006a     msp430_uart.obj (.text:UartA2_Init)
+                  00011216    00000066     rts430x_lc_rd_eabi.lib : fixdli.obj (.text:__mspabi_fixdli)
+                  0001127c    00000064                            : cvtfd.obj (.text:__mspabi_cvtfd)
+                  000112e0    00000062                            : copy_decompress_rle.obj (.text:__TI_decompress_rle_core)
+                  00011342    00000062     Display.obj (.text:displayCar)
+                  000113a4    00000062     Display.obj (.text:displayPeople)
+                  00011406    0000005e     I2C.obj (.text:I2C_Master_Display_Init)
+                  00011464    0000005e     Display.obj (.text:displayLeftSide)
+                  000114c2    0000005e     Display.obj (.text:displayRightSide)
+                  00011520    0000005c     main.obj (.text:displayProcess)
+                  0001157c    00000058     rts430x_lc_rd_eabi.lib : div32u.obj (.text)
+                  000115d4    00000048     Display.obj (.text:Clear_RAM)
+                  0001161c    00000042     Display.obj (.text:Set_Column_Address)
+                  0001165e    00000042     Display.obj (.text:displayCarOnly)
+                  000116a0    00000040     msp430_uart.obj (.text:UartA2_setParity)
+                  000116e0    00000040     msp430_uart.obj (.text:Uart_setParity)
+                  00011720    00000040     Display.obj (.text:displayPeopleWithRightSide)
+                  00011760    0000003e     rts430x_lc_rd_eabi.lib : asr32.obj (.text:l_asr_const)
+                  0001179e    0000003e                            : lsl32.obj (.text:l_lsl_const)
+                  000117dc    0000003e                            : lsr32.obj (.text:l_lsr_const)
+                  0001181a    0000003c     Display.obj (.text:displayPeopleOnly)
+                  00011856    0000003c     Display.obj (.text:displayPeopleWithLeftSide)
+                  00011892    0000003a     I2C.obj (.text:I2C_Write_Packet_To_Display)
+                  000118cc    0000003a     Display.obj (.text:Set_Addressing_Mode)
+                  00011906    0000003a     Display.obj (.text:Set_Charge_Pump)
+                  00011940    0000003a     Display.obj (.text:Set_Common_Config)
+                  0001197a    0000003a     Display.obj (.text:Set_Contrast_Control)
+                  000119b4    0000003a     Display.obj (.text:Set_Display_Clock)
+                  000119ee    0000003a     Display.obj (.text:Set_Display_Offset)
+                  00011a28    0000003a     Display.obj (.text:Set_Multiplex_Ratio)
+                  00011a62    0000003a     Display.obj (.text:Set_Precharge_Period)
+                  00011a9c    0000003a     Display.obj (.text:Set_VCOMH)
+                  00011ad6    00000036     rts430x_lc_rd_eabi.lib : fs_itof.obj (.text)
+                  00011b0c    00000030     Display.obj (.text:displayBlankLine)
+                  00011b3c    0000002c     rts430x_lc_rd_eabi.lib : div16s.obj (.text)
+                  00011b68    00000028                            : fixdi.obj (.text:__mspabi_fixdi)
+                  00011b90    00000026     msp430_uart.obj (.text:UartA2_setLMSBMode)
+                  00011bb6    00000026     msp430_uart.obj (.text:Uart_setLMSBMode)
+                  00011bdc    00000026     Display.obj (.text:displayCarWithLeftSide)
+                  00011c02    00000024     rts430x_lc_rd_eabi.lib : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
+                  00011c26    00000022     Display.obj (.text:displayLeftSideOnly)
+                  00011c48    00000022     rts430x_lc_rd_eabi.lib : mult32_f5hw.obj (.text)
+                  00011c6a    00000020     Display.obj (.text:displayCarWithRightSide)
+                  00011c8a    00000020     Display.obj (.text:displayRightSideOnly)
+                  00011caa    0000001e     Display.obj (.text:Set_Page_Address)
+                  00011cc8    0000001e     Display.obj (.text:Set_Start_Line)
+                  00011ce6    0000001a     Display.obj (.text:Set_Common_Remap)
+                  00011d00    0000001a     Display.obj (.text:Set_Display_On_Off)
+                  00011d1a    0000001a     Display.obj (.text:Set_Entire_Display)
+                  00011d34    0000001a     Display.obj (.text:Set_Inverse_Display)
+                  00011d4e    0000001a     Display.obj (.text:Set_Segment_Remap)
+                  00011d68    0000001a     msp430_uart.obj (.text:UartA2_setbitMode)
+                  00011d82    0000001a     msp430_uart.obj (.text:Uart_setbitMode)
+                  00011d9c    0000001a     Display.obj (.text:display1Byte)
+                  00011db6    00000016     msp430_uart.obj (.text:UartA2_setstopbitMode)
+                  00011dcc    00000016     msp430_uart.obj (.text:Uart_setstopbitMode)
+                  00011de2    00000016     main.obj (.text:clearBufferAndStatus)
+                  00011df8    00000016     rts430x_lc_rd_eabi.lib : div16u.obj (.text)
+                  00011e0e    00000016                            : mult16_f5hw.obj (.text)
+                  00011e24    00000014                            : memcpy.obj (.text:memcpy)
+                  00011e38    00000012     Display.obj (.text:Turn_Display_On)
+                  00011e4a    00000012     rts430x_lc_rd_eabi.lib : copy_decompress_none.obj (.text:decompress:none:__TI_decompress_none)
+                  00011e5c    00000010                            : lsr32.obj (.text:l_lsr)
+                  00011e6c    00000006     I2C.obj (.text:I2C_Display_Disable)
+                  00011e72    00000006     I2C.obj (.text:I2C_Display_Enable)
+                  00011e78    00000006     I2C.obj (.text:I2C_Display_Interrupt_Enable)
+                  00011e7e    00000006     msp430_uart.obj (.text:UartA2_disableRXINT)
+                  00011e84    00000006     msp430_uart.obj (.text:UartA2_enableRXINT)
+                  00011e8a    00000006     msp430_uart.obj (.text:Uart_disableRXINT)
+                  00011e90    00000006     msp430_uart.obj (.text:Uart_enableRXINT)
+                  00011e96    00000006     rts430x_lc_rd_eabi.lib : isr_trap.obj (.text:__TI_ISR_TRAP)
+                  00011e9c    00000006                            : copy_decompress_rle.obj (.text:decompress:rle24:__TI_decompress_rle24)
+                  00011ea2    00000004                            : pre_init.obj (.text:_system_pre_init)
+                  00011ea6    00000004                            : exit.obj (.text:abort)
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 0000833e records: 2, size/record: 8, table size: 16
-	.data: load addr=0000810e, load size=0000021d bytes, run addr=00002400, run size=00000258 bytes, compression=rle
-	.bss: load addr=00008338, load size=00000006 bytes, run addr=00002658, run size=00000003 bytes, compression=zero_init
+__TI_cinit_table @ 00008410 records: 2, size/record: 8, table size: 16
+	.data: load addr=000081dc, load size=00000221 bytes, run addr=00002400, run size=00000280 bytes, compression=rle
+	.bss: load addr=0000840a, load size=00000006 bytes, run addr=00002680, run size=00000004 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 0000832c records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 000083fe records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_rle24
 	index: 2, handler: __TI_decompress_none
@@ -427,7 +453,7 @@ address    name
 00000486   BAKMEM3_L
 000004be   BCD2BIN
 000004bc   BIN2BCD
-000112a2   C$$EXIT
+00011ea6   C$$EXIT
 00002400   CAR_YES
 000008c0   CBCTL0
 000008c1   CBCTL0_H
@@ -457,7 +483,7 @@ address    name
 00000156   CRCRESR
 00000157   CRCRESR_H
 00000156   CRCRESR_L
-00010b7e   Clear_RAM
+000115d4   Clear_RAM
 00000786   DAC12_0CALCTL
 00000788   DAC12_0CALDAT
 00000780   DAC12_0CTL0
@@ -535,7 +561,7 @@ address    name
 0000050e   DMAIV
 0000050f   DMAIV_H
 0000050e   DMAIV_L
-00010606   Display_Initial
+00010d0c   Display_Initial
 00000140   FCTL1
 00000141   FCTL1_H
 00000140   FCTL1_L
@@ -545,11 +571,11 @@ address    name
 00000146   FCTL4
 00000147   FCTL4_H
 00000146   FCTL4_L
-00011274   I2C_Display_Disable
-0001127a   I2C_Display_Enable
-00011280   I2C_Display_Interrupt_Enable
-000109b0   I2C_Master_Display_Init
-00010d80   I2C_Write_Packet_To_Display
+00011e6c   I2C_Display_Disable
+00011e72   I2C_Display_Enable
+00011e78   I2C_Display_Interrupt_Enable
+00011406   I2C_Master_Display_Init
+00011892   I2C_Write_Packet_To_Display
 000004c4   MAC
 000004da   MAC32H
 000004db   MAC32H_H
@@ -589,16 +615,16 @@ address    name
 000004c2   MPYS_L
 000004c1   MPY_H
 000004c0   MPY_L
-000024ac   NUM_0
-000024cc   NUM_1
-000024ec   NUM_2
-0000250c   NUM_3
-0000252c   NUM_4
-0000254c   NUM_5
-0000256c   NUM_6
-0000258c   NUM_7
-000025ac   NUM_8
-000025cc   NUM_9
+000024da   NUM_0
+000024fa   NUM_1
+0000251a   NUM_2
+0000253a   NUM_3
+0000255a   NUM_4
+0000257a   NUM_5
+0000259a   NUM_6
+000025ba   NUM_7
+000025da   NUM_8
+000025fa   NUM_9
 000004c8   OP2
 000004e2   OP2H
 000004e3   OP2H_H
@@ -836,8 +862,8 @@ address    name
 00000104   SFRRPCR
 00000105   SFRRPCR_H
 00000104   SFRRPCR_L
-00002608   SIDE_LANE_LEFT
-0000261c   SIDE_LANE_RIGHT
+0000261a   SIDE_LANE_LEFT
+0000262e   SIDE_LANE_RIGHT
 000004ce   SUMEXT
 000004cf   SUMEXT_H
 000004ce   SUMEXT_L
@@ -883,23 +909,23 @@ address    name
 0000019a   SYSUNIV
 0000019b   SYSUNIV_H
 0000019a   SYSUNIV_L
-00010dba   Set_Addressing_Mode
-00010df4   Set_Charge_Pump
-00010bc6   Set_Column_Address
-00010e2e   Set_Common_Config
-0001112e   Set_Common_Remap
-00010e68   Set_Contrast_Control
-00010ea2   Set_Display_Clock
-00010edc   Set_Display_Offset
-00011148   Set_Display_On_Off
-00011162   Set_Entire_Display
-0001117c   Set_Inverse_Display
-00010f16   Set_Multiplex_Ratio
-000110f2   Set_Page_Address
-00010f50   Set_Precharge_Period
-00011196   Set_Segment_Remap
-00011110   Set_Start_Line
-00010f8a   Set_VCOMH
+000118cc   Set_Addressing_Mode
+00011906   Set_Charge_Pump
+0001161c   Set_Column_Address
+00011940   Set_Common_Config
+00011ce6   Set_Common_Remap
+0001197a   Set_Contrast_Control
+000119b4   Set_Display_Clock
+000119ee   Set_Display_Offset
+00011d00   Set_Display_On_Off
+00011d1a   Set_Entire_Display
+00011d34   Set_Inverse_Display
+00011a28   Set_Multiplex_Ratio
+00011caa   Set_Page_Address
+00011a62   Set_Precharge_Period
+00011d4e   Set_Segment_Remap
+00011cc8   Set_Start_Line
+00011a9c   Set_VCOMH
 00000352   TA0CCR0
 00000354   TA0CCR1
 00000356   TA0CCR2
@@ -952,11 +978,11 @@ address    name
 000003e0   TB0EX0
 000003ee   TB0IV
 000003d0   TB0R
-000080b4   TIMER1_A0_ISR
-0000265a   TXByteCtr
-00002657   TXDataBuff_Count
-00011250   Turn_Display_On
-00002658   TxDataBuff
+00008182   TIMER1_A0_ISR
+00002682   TXByteCtr
+0000267f   TXDataBuff_Count
+00011e38   Turn_Display_On
+00002680   TxDataBuff
 000005d0   UCA0ABCTL
 000005c6   UCA0BRW
 000005c7   UCA0BRW_H
@@ -1229,31 +1255,40 @@ address    name
 00000932   USBVECINT
 00000933   USBVECINT_H
 00000932   USBVECINT_L
-00008000   USCI_A0_ISR
-00008070   USCI_I2C_Display_ISR
-0001070e   Uart_Init
-00011286   Uart_disableRXINT
-0001128c   Uart_enableRXINT
-00011020   Uart_setLMSBMode
-00010c4a   Uart_setParity
-000111b0   Uart_setbitMode
-000111e4   Uart_setstopbitMode
+000080ce   USCI_A0_ISR
+00008000   USCI_A2_ISR
+0000813e   USCI_I2C_Display_ISR
+000111ac   UartA2_Init
+00011e7e   UartA2_disableRXINT
+00011e84   UartA2_enableRXINT
+00011b90   UartA2_setLMSBMode
+000116a0   UartA2_setParity
+00011d68   UartA2_setbitMode
+00011db6   UartA2_setstopbitMode
+00010fa2   Uart_Init
+00011e8a   Uart_disableRXINT
+00011e90   Uart_enableRXINT
+00011bb6   Uart_setLMSBMode
+000116e0   Uart_setParity
+00011d82   Uart_setbitMode
+00011dcc   Uart_setstopbitMode
 0000015c   WDTCTL
 0000015d   WDTCTL_H
 0000015c   WDTCTL_L
 00006400   __STACK_END
 000000a0   __STACK_SIZE
-0000833e   __TI_CINIT_Base
-0000834e   __TI_CINIT_Limit
-0000832c   __TI_Handler_Table_Base
-00008338   __TI_Handler_Table_Limit
+00008410   __TI_CINIT_Base
+00008420   __TI_CINIT_Limit
+000083fe   __TI_Handler_Table_Base
+0000840a   __TI_Handler_Table_Limit
 UNDEFED    __TI_INITARRAY_Base
 UNDEFED    __TI_INITARRAY_Limit
-00011292   __TI_ISR_TRAP
+00011e96   __TI_ISR_TRAP
 00000001   __TI_args_main
-00011262   __TI_decompress_none
-00011298   __TI_decompress_rle24
+00011e4a   __TI_decompress_none
+00011e9c   __TI_decompress_rle24
 00000001   __TI_exit
+00010492   __TI_frcmpyd
 0000ffc6   __TI_int35
 0000ffc8   __TI_int36
 0000ffca   __TI_int37
@@ -1281,77 +1316,132 @@ UNDEFED    __TI_INITARRAY_Limit
 0000fff8   __TI_int60
 0000fffa   __TI_int61
 0000fffc   __TI_int62
-0001106c   __TI_zero_init
+00011c02   __TI_zero_init
 ffffffff   __binit__
 ffffffff   __c_args__
-00010ff4   __mspabi_divi
-00011210   __mspabi_divu
-00010b26   __mspabi_divul
-00011226   __mspabi_mpyi_f5hw
-00010ff4   __mspabi_remi
-00011210   __mspabi_remu
-00010b26   __mspabi_remul
-00010d02   __mspabi_srll_1
-00010cde   __mspabi_srll_10
-00010cda   __mspabi_srll_11
-00010cd6   __mspabi_srll_12
-00010cd2   __mspabi_srll_13
-00010cce   __mspabi_srll_14
-00010cca   __mspabi_srll_15
-00010cfe   __mspabi_srll_2
-00010cfa   __mspabi_srll_3
-00010cf6   __mspabi_srll_4
-00010cf2   __mspabi_srll_5
-00010cee   __mspabi_srll_6
-00010cea   __mspabi_srll_7
-00010ce6   __mspabi_srll_8
-00010ce2   __mspabi_srll_9
-0001081c   _auto_init_hold_wdt
-000080f4   _c_int00
-000080f4   _c_int00_noexit
+00010be2   __mspabi_addf
+0001127c   __mspabi_cvtfd
+00011036   __mspabi_divf
+00011b3c   __mspabi_divi
+00011df8   __mspabi_divu
+0001157c   __mspabi_divul
+00011b68   __mspabi_fixdi
+00011216   __mspabi_fixdli
+00011ad6   __mspabi_fltif
+00010776   __mspabi_mpyd
+00010eec   __mspabi_mpyf
+00011e0e   __mspabi_mpyi_f5hw
+00011c48   __mspabi_mpyl_f5hw
+00011b3c   __mspabi_remi
+00011df8   __mspabi_remu
+0001157c   __mspabi_remul
+000117d6   __mspabi_slll_1
+000117b2   __mspabi_slll_10
+000117ae   __mspabi_slll_11
+000117aa   __mspabi_slll_12
+000117a6   __mspabi_slll_13
+000117a2   __mspabi_slll_14
+0001179e   __mspabi_slll_15
+000117d2   __mspabi_slll_2
+000117ce   __mspabi_slll_3
+000117ca   __mspabi_slll_4
+000117c6   __mspabi_slll_5
+000117c2   __mspabi_slll_6
+000117be   __mspabi_slll_7
+000117ba   __mspabi_slll_8
+000117b6   __mspabi_slll_9
+00011798   __mspabi_sral_1
+00011774   __mspabi_sral_10
+00011770   __mspabi_sral_11
+0001176c   __mspabi_sral_12
+00011768   __mspabi_sral_13
+00011764   __mspabi_sral_14
+00011760   __mspabi_sral_15
+00011794   __mspabi_sral_2
+00011790   __mspabi_sral_3
+0001178c   __mspabi_sral_4
+00011788   __mspabi_sral_5
+00011784   __mspabi_sral_6
+00011780   __mspabi_sral_7
+0001177c   __mspabi_sral_8
+00011778   __mspabi_sral_9
+00011e5c   __mspabi_srll
+00011814   __mspabi_srll_1
+000117f0   __mspabi_srll_10
+000117ec   __mspabi_srll_11
+000117e8   __mspabi_srll_12
+000117e4   __mspabi_srll_13
+000117e0   __mspabi_srll_14
+000117dc   __mspabi_srll_15
+00011810   __mspabi_srll_2
+0001180c   __mspabi_srll_3
+00011808   __mspabi_srll_4
+00011804   __mspabi_srll_5
+00011800   __mspabi_srll_6
+000117fc   __mspabi_srll_7
+000117f8   __mspabi_srll_8
+000117f4   __mspabi_srll_9
+00010bdc   __mspabi_subf
+0001113e   _auto_init_hold_wdt
+000081c2   _c_int00
+000081c2   _c_int00_noexit
 0000fffe   _reset_vector
 00006360   _stack
-0001129e   _system_pre_init
-000112a2   abort
-00002606   beep_gap
+00011ea2   _system_pre_init
+00011ea6   abort
+000024c6   beep_gap
 ffffffff   binit
-000025f4   broken_flag
-00002604   check_vel_first
-000111fa   clearBufferAndStatus
-00002630   cmd_buff
-000025f2   cmd_buff_cnt
-000025f0   cmd_buff_pos
-00002642   cmd_recv
-000025ee   cmd_recv_cnt
-000025ec   cmd_recv_pos
-000025f8   disp_car_status
-000025fc   disp_left_status
-000025fa   disp_people_status
-000025fe   disp_right_status
-00002600   disp_velocity_status
-000111ca   display1Byte
-00010fc4   displayBlankLine
-000108ec   displayCar
-00010c08   displayCarOnly
-00011046   displayCarWithLeftSide
-000110b2   displayCarWithRightSide
-00010a0e   displayLeftSide
-00011090   displayLeftSideOnly
-0001094e   displayPeople
-00010d08   displayPeopleOnly
-00010d44   displayPeopleWithLeftSide
-00010c8a   displayPeopleWithRightSide
-00010aca   displayProcess
-00010a6c   displayRightSide
-000110d2   displayRightSideOnly
-00010430   displayVelocity
-000025f7   glitch_check
+000024b4   broken_flag
+000024c4   check_vel_first
+00011de2   clearBufferAndStatus
+00002642   cmd_buff
+000024b2   cmd_buff_cnt
+000024b0   cmd_buff_pos
+00002654   cmd_recv
+000024ae   cmd_recv_cnt
+000024ac   cmd_recv_pos
+000024b8   disp_car_status
+000024bc   disp_left_status
+000024ba   disp_people_status
+000024be   disp_right_status
+000024c0   disp_velocity_status
+00011d9c   display1Byte
+00011b0c   displayBlankLine
+00011342   displayCar
+0001165e   displayCarOnly
+00011bdc   displayCarWithLeftSide
+00011c6a   displayCarWithRightSide
+00011464   displayLeftSide
+00011c26   displayLeftSideOnly
+000113a4   displayPeople
+0001181a   displayPeopleOnly
+00011856   displayPeopleWithLeftSide
+00011720   displayPeopleWithRightSide
+00011520   displayProcess
+000114c2   displayRightSide
+00011c8a   displayRightSideOnly
+000109f8   displayVelocity
+00010e14   getGpsVelocity
+000024b7   glitch_check
+000024d0   gps_comma_count
+00002683   gps_recv_char
+00002676   gps_tag
+000024cc   gps_tag_check_flag
+000024ca   gps_tag_count
+000024c8   gps_tag_flag
+00002666   gps_velocity
+0000266e   gps_velocity_buff
+000024d8   gps_velocity_buff_count
+000024d4   gps_velocity_count
+000024ce   gps_velocity_flag
+000024d6   gps_velocity_ready
+000024d2   gps_velocity_recv_flag
 00010000   main
-0001123c   memcpy
-000107a2   numberMapping
-000025f6   operation_mode
-00002602   velocity
-00002654   velocity_status
+00011e24   memcpy
+000110c4   numberMapping
+000024b6   operation_mode
+000024c2   velocity
+0000267c   velocity_status
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -2226,50 +2316,64 @@ address    name
 000023ff   USBIEPSIZXY_7
 00002400   CAR_YES
 00002460   PED_YES
-000024ac   NUM_0
-000024cc   NUM_1
-000024ec   NUM_2
-0000250c   NUM_3
-0000252c   NUM_4
-0000254c   NUM_5
-0000256c   NUM_6
-0000258c   NUM_7
-000025ac   NUM_8
-000025cc   NUM_9
-000025ec   cmd_recv_pos
-000025ee   cmd_recv_cnt
-000025f0   cmd_buff_pos
-000025f2   cmd_buff_cnt
-000025f4   broken_flag
-000025f6   operation_mode
-000025f7   glitch_check
-000025f8   disp_car_status
-000025fa   disp_people_status
-000025fc   disp_left_status
-000025fe   disp_right_status
-00002600   disp_velocity_status
-00002602   velocity
-00002604   check_vel_first
-00002606   beep_gap
-00002608   SIDE_LANE_LEFT
-0000261c   SIDE_LANE_RIGHT
-00002630   cmd_buff
-00002642   cmd_recv
-00002654   velocity_status
-00002657   TXDataBuff_Count
-00002658   TxDataBuff
-0000265a   TXByteCtr
+000024ac   cmd_recv_pos
+000024ae   cmd_recv_cnt
+000024b0   cmd_buff_pos
+000024b2   cmd_buff_cnt
+000024b4   broken_flag
+000024b6   operation_mode
+000024b7   glitch_check
+000024b8   disp_car_status
+000024ba   disp_people_status
+000024bc   disp_left_status
+000024be   disp_right_status
+000024c0   disp_velocity_status
+000024c2   velocity
+000024c4   check_vel_first
+000024c6   beep_gap
+000024c8   gps_tag_flag
+000024ca   gps_tag_count
+000024cc   gps_tag_check_flag
+000024ce   gps_velocity_flag
+000024d0   gps_comma_count
+000024d2   gps_velocity_recv_flag
+000024d4   gps_velocity_count
+000024d6   gps_velocity_ready
+000024d8   gps_velocity_buff_count
+000024da   NUM_0
+000024fa   NUM_1
+0000251a   NUM_2
+0000253a   NUM_3
+0000255a   NUM_4
+0000257a   NUM_5
+0000259a   NUM_6
+000025ba   NUM_7
+000025da   NUM_8
+000025fa   NUM_9
+0000261a   SIDE_LANE_LEFT
+0000262e   SIDE_LANE_RIGHT
+00002642   cmd_buff
+00002654   cmd_recv
+00002666   gps_velocity
+0000266e   gps_velocity_buff
+00002676   gps_tag
+0000267c   velocity_status
+0000267f   TXDataBuff_Count
+00002680   TxDataBuff
+00002682   TXByteCtr
+00002683   gps_recv_char
 00006360   _stack
 00006400   __STACK_END
-00008000   USCI_A0_ISR
-00008070   USCI_I2C_Display_ISR
-000080b4   TIMER1_A0_ISR
-000080f4   _c_int00
-000080f4   _c_int00_noexit
-0000832c   __TI_Handler_Table_Base
-00008338   __TI_Handler_Table_Limit
-0000833e   __TI_CINIT_Base
-0000834e   __TI_CINIT_Limit
+00008000   USCI_A2_ISR
+000080ce   USCI_A0_ISR
+0000813e   USCI_I2C_Display_ISR
+00008182   TIMER1_A0_ISR
+000081c2   _c_int00
+000081c2   _c_int00_noexit
+000083fe   __TI_Handler_Table_Base
+0000840a   __TI_Handler_Table_Limit
+00008410   __TI_CINIT_Base
+00008420   __TI_CINIT_Limit
 0000ffc6   __TI_int35
 0000ffc8   __TI_int36
 0000ffca   __TI_int37
@@ -2299,91 +2403,141 @@ address    name
 0000fffc   __TI_int62
 0000fffe   _reset_vector
 00010000   main
-00010430   displayVelocity
-00010606   Display_Initial
-0001070e   Uart_Init
-000107a2   numberMapping
-0001081c   _auto_init_hold_wdt
-000108ec   displayCar
-0001094e   displayPeople
-000109b0   I2C_Master_Display_Init
-00010a0e   displayLeftSide
-00010a6c   displayRightSide
-00010aca   displayProcess
-00010b26   __mspabi_divul
-00010b26   __mspabi_remul
-00010b7e   Clear_RAM
-00010bc6   Set_Column_Address
-00010c08   displayCarOnly
-00010c4a   Uart_setParity
-00010c8a   displayPeopleWithRightSide
-00010cca   __mspabi_srll_15
-00010cce   __mspabi_srll_14
-00010cd2   __mspabi_srll_13
-00010cd6   __mspabi_srll_12
-00010cda   __mspabi_srll_11
-00010cde   __mspabi_srll_10
-00010ce2   __mspabi_srll_9
-00010ce6   __mspabi_srll_8
-00010cea   __mspabi_srll_7
-00010cee   __mspabi_srll_6
-00010cf2   __mspabi_srll_5
-00010cf6   __mspabi_srll_4
-00010cfa   __mspabi_srll_3
-00010cfe   __mspabi_srll_2
-00010d02   __mspabi_srll_1
-00010d08   displayPeopleOnly
-00010d44   displayPeopleWithLeftSide
-00010d80   I2C_Write_Packet_To_Display
-00010dba   Set_Addressing_Mode
-00010df4   Set_Charge_Pump
-00010e2e   Set_Common_Config
-00010e68   Set_Contrast_Control
-00010ea2   Set_Display_Clock
-00010edc   Set_Display_Offset
-00010f16   Set_Multiplex_Ratio
-00010f50   Set_Precharge_Period
-00010f8a   Set_VCOMH
-00010fc4   displayBlankLine
-00010ff4   __mspabi_divi
-00010ff4   __mspabi_remi
-00011020   Uart_setLMSBMode
-00011046   displayCarWithLeftSide
-0001106c   __TI_zero_init
-00011090   displayLeftSideOnly
-000110b2   displayCarWithRightSide
-000110d2   displayRightSideOnly
-000110f2   Set_Page_Address
-00011110   Set_Start_Line
-0001112e   Set_Common_Remap
-00011148   Set_Display_On_Off
-00011162   Set_Entire_Display
-0001117c   Set_Inverse_Display
-00011196   Set_Segment_Remap
-000111b0   Uart_setbitMode
-000111ca   display1Byte
-000111e4   Uart_setstopbitMode
-000111fa   clearBufferAndStatus
-00011210   __mspabi_divu
-00011210   __mspabi_remu
-00011226   __mspabi_mpyi_f5hw
-0001123c   memcpy
-00011250   Turn_Display_On
-00011262   __TI_decompress_none
-00011274   I2C_Display_Disable
-0001127a   I2C_Display_Enable
-00011280   I2C_Display_Interrupt_Enable
-00011286   Uart_disableRXINT
-0001128c   Uart_enableRXINT
-00011292   __TI_ISR_TRAP
-00011298   __TI_decompress_rle24
-0001129e   _system_pre_init
-000112a2   C$$EXIT
-000112a2   abort
+00010492   __TI_frcmpyd
+00010776   __mspabi_mpyd
+000109f8   displayVelocity
+00010bdc   __mspabi_subf
+00010be2   __mspabi_addf
+00010d0c   Display_Initial
+00010e14   getGpsVelocity
+00010eec   __mspabi_mpyf
+00010fa2   Uart_Init
+00011036   __mspabi_divf
+000110c4   numberMapping
+0001113e   _auto_init_hold_wdt
+000111ac   UartA2_Init
+00011216   __mspabi_fixdli
+0001127c   __mspabi_cvtfd
+00011342   displayCar
+000113a4   displayPeople
+00011406   I2C_Master_Display_Init
+00011464   displayLeftSide
+000114c2   displayRightSide
+00011520   displayProcess
+0001157c   __mspabi_divul
+0001157c   __mspabi_remul
+000115d4   Clear_RAM
+0001161c   Set_Column_Address
+0001165e   displayCarOnly
+000116a0   UartA2_setParity
+000116e0   Uart_setParity
+00011720   displayPeopleWithRightSide
+00011760   __mspabi_sral_15
+00011764   __mspabi_sral_14
+00011768   __mspabi_sral_13
+0001176c   __mspabi_sral_12
+00011770   __mspabi_sral_11
+00011774   __mspabi_sral_10
+00011778   __mspabi_sral_9
+0001177c   __mspabi_sral_8
+00011780   __mspabi_sral_7
+00011784   __mspabi_sral_6
+00011788   __mspabi_sral_5
+0001178c   __mspabi_sral_4
+00011790   __mspabi_sral_3
+00011794   __mspabi_sral_2
+00011798   __mspabi_sral_1
+0001179e   __mspabi_slll_15
+000117a2   __mspabi_slll_14
+000117a6   __mspabi_slll_13
+000117aa   __mspabi_slll_12
+000117ae   __mspabi_slll_11
+000117b2   __mspabi_slll_10
+000117b6   __mspabi_slll_9
+000117ba   __mspabi_slll_8
+000117be   __mspabi_slll_7
+000117c2   __mspabi_slll_6
+000117c6   __mspabi_slll_5
+000117ca   __mspabi_slll_4
+000117ce   __mspabi_slll_3
+000117d2   __mspabi_slll_2
+000117d6   __mspabi_slll_1
+000117dc   __mspabi_srll_15
+000117e0   __mspabi_srll_14
+000117e4   __mspabi_srll_13
+000117e8   __mspabi_srll_12
+000117ec   __mspabi_srll_11
+000117f0   __mspabi_srll_10
+000117f4   __mspabi_srll_9
+000117f8   __mspabi_srll_8
+000117fc   __mspabi_srll_7
+00011800   __mspabi_srll_6
+00011804   __mspabi_srll_5
+00011808   __mspabi_srll_4
+0001180c   __mspabi_srll_3
+00011810   __mspabi_srll_2
+00011814   __mspabi_srll_1
+0001181a   displayPeopleOnly
+00011856   displayPeopleWithLeftSide
+00011892   I2C_Write_Packet_To_Display
+000118cc   Set_Addressing_Mode
+00011906   Set_Charge_Pump
+00011940   Set_Common_Config
+0001197a   Set_Contrast_Control
+000119b4   Set_Display_Clock
+000119ee   Set_Display_Offset
+00011a28   Set_Multiplex_Ratio
+00011a62   Set_Precharge_Period
+00011a9c   Set_VCOMH
+00011ad6   __mspabi_fltif
+00011b0c   displayBlankLine
+00011b3c   __mspabi_divi
+00011b3c   __mspabi_remi
+00011b68   __mspabi_fixdi
+00011b90   UartA2_setLMSBMode
+00011bb6   Uart_setLMSBMode
+00011bdc   displayCarWithLeftSide
+00011c02   __TI_zero_init
+00011c26   displayLeftSideOnly
+00011c48   __mspabi_mpyl_f5hw
+00011c6a   displayCarWithRightSide
+00011c8a   displayRightSideOnly
+00011caa   Set_Page_Address
+00011cc8   Set_Start_Line
+00011ce6   Set_Common_Remap
+00011d00   Set_Display_On_Off
+00011d1a   Set_Entire_Display
+00011d34   Set_Inverse_Display
+00011d4e   Set_Segment_Remap
+00011d68   UartA2_setbitMode
+00011d82   Uart_setbitMode
+00011d9c   display1Byte
+00011db6   UartA2_setstopbitMode
+00011dcc   Uart_setstopbitMode
+00011de2   clearBufferAndStatus
+00011df8   __mspabi_divu
+00011df8   __mspabi_remu
+00011e0e   __mspabi_mpyi_f5hw
+00011e24   memcpy
+00011e38   Turn_Display_On
+00011e4a   __TI_decompress_none
+00011e5c   __mspabi_srll
+00011e6c   I2C_Display_Disable
+00011e72   I2C_Display_Enable
+00011e78   I2C_Display_Interrupt_Enable
+00011e7e   UartA2_disableRXINT
+00011e84   UartA2_enableRXINT
+00011e8a   Uart_disableRXINT
+00011e90   Uart_enableRXINT
+00011e96   __TI_ISR_TRAP
+00011e9c   __TI_decompress_rle24
+00011ea2   _system_pre_init
+00011ea6   C$$EXIT
+00011ea6   abort
 ffffffff   __binit__
 ffffffff   __c_args__
 ffffffff   binit
 UNDEFED    __TI_INITARRAY_Base
 UNDEFED    __TI_INITARRAY_Limit
 
-[1027 symbols]
+[1091 symbols]

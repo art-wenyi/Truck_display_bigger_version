@@ -35,8 +35,25 @@ int velocity = 0;
 int check_vel_first = 0;
 int beep_gap=0;                   // counter of the beeper
 
+//====== below vars are for gps signals ==========
+char gps_recv_char;
+char gps_tag[6] = {""};				// store the gps id tag, format is like '$GPGSA'
+int gps_tag_flag = 0;				// indicate whether gps_tag is coming
+int gps_tag_count = 1;				// count from 1 to 5
+int gps_tag_check_flag = 0;         // indicate whether gps_tag is ready for check
+int gps_velocity_flag = 0;			// indicate whether gps velocity signals is coming
+int gps_comma_count = 0;   			// count the comma 7 times before velocity info come
+int gps_velocity_recv_flag = 0;     // indicate velocity is coming
+char gps_velocity[8] = {""};			// store the velocity chars
+int gps_velocity_count = 0;			// count the valid chars in gep velocity
+int gps_velocity_ready = 0;			// indicate velocity is ready or not
+char gps_velocity_buff[8] = {""};			// store the velocity chars buffer
+int gps_velocity_buff_count = 0;			// count the valid chars in gep velocity
+
 void clearBufferAndStatus();         // just clear buffer and status
 void displayProcess();               // display the screen
+void transmitGpsVelocity(int gps_vel_kilo);
+int getGpsVelocity();
 
 void main(void)
 {
@@ -78,6 +95,7 @@ void main(void)
 		} while (SFRIFG1 & OFIFG); // Test oscillator fault flag
 
   Uart_Init(9600, 'n', 'l', '8', 1);		  // init uart 1
+  UartA2_Init(9600, 'n', 'l', '8', 1);		  // init uart 2
   Display_Initial();                         // init display
   int delay=0;
   for(delay=0;delay<10;delay++) __delay_cycles(640000);        // just a delay, add if u want
@@ -85,139 +103,161 @@ void main(void)
   //__bis_SR_register(LPM0_bits + GIE);       // Enter LPM0, interrupts enabled
   __no_operation();                         // For debugger
 
-  int loop_tmp=0;                // c language can't init this variables in loop
-  while(1){
-	  while(cmd_recv_cnt<18) _NOP();      // wait for the buffer get filled
-	  Uart_disableRXINT();               // disable uart receiver before processing
-	  cmd_buff_cnt = cmd_recv_cnt;       // store the recv count and buff pos
-	  cmd_buff_pos = 0;
-	  for(loop_tmp=0;loop_tmp<18;loop_tmp++){
-		  cmd_buff[loop_tmp] = cmd_recv[loop_tmp];
-	  }
-	  clearBufferAndStatus();
-	  Uart_enableRXINT();               // reable uart receiver before processing
-	  if(check_vel_first == 1){         // need to check first 3 volicity digit first, it's follow up bit from last round
-		  velocity_status[0] = cmd_buff[cmd_buff_pos];	// store the hundred's digit
-		  velocity_status[1] = cmd_buff[cmd_buff_pos+1];	// store the ten's digit
-		  velocity_status[2] = cmd_buff[cmd_buff_pos+2];    // store the digit
-		  check_vel_first = 0;          // reset this velocity first check after checking first 3 digits
-		  if(velocity_status[0]<'0'|| velocity_status[0]>'9'
-				  || velocity_status[1]<'0'|| velocity_status[1]>'9'          // if any of these digit is not a valid number, break, go next process
-				  || velocity_status[2]<'0'|| velocity_status[2]>'9'){
-		  }else{
-			  velocity = (velocity_status[0]-'0')*100 + (velocity_status[1]-'0')*10 + (velocity_status[2]-'0'); // calculate the velocity
-			  disp_velocity_status = ON;
-		  }
-		  cmd_buff_pos += 3;       // move forward position for 1 pos, jump over processed one
-		  cmd_buff_cnt -= 3;
-	  }
+  int gps_velocity_kilometer = 0;
 
-	  // main command detect loop
-	  while(cmd_buff_cnt>0){        // break judge
-		  while(cmd_buff_cnt>0 && (cmd_buff[cmd_buff_pos] != 'c' && cmd_buff[cmd_buff_pos] != 'p'    // detect first valid operation mode char, if no error, should be at pos 0
-				  	  	  	   && cmd_buff[cmd_buff_pos] != 'l' && cmd_buff[cmd_buff_pos] != 'r'     // if all invalid, cnt will go down to 0 and break loop;
-				  	  	  	   && cmd_buff[cmd_buff_pos] != 'v')\
-			   ){
-			  cmd_buff_cnt--;	  // total buff info count -1
-			  cmd_buff_pos++;     // move to the next buff position
+
+   int loop_tmp=0;                // c language can't init this variables in loop
+  while(1){
+	  //while(cmd_recv_cnt<18) _NOP();      // wait for the buffer get filled
+	  if(cmd_recv_cnt>=18){
+		  Uart_disableRXINT();               // disable uart receiver before processing
+		  UartA2_disableRXINT();               // disable uart receiver before processing
+		  cmd_buff_cnt = cmd_recv_cnt;       // store the recv count and buff pos
+		  cmd_buff_pos = 0;
+		  for(loop_tmp=0;loop_tmp<18;loop_tmp++){
+			  cmd_buff[loop_tmp] = cmd_recv[loop_tmp];
 		  }
-		  while(cmd_buff_cnt>0){
-			  operation_mode = cmd_buff[cmd_buff_pos++];        // store the operation mode char
-			  cmd_buff_cnt--;									// buff count -1
-			  if(cmd_buff_cnt<=1){
-				  broken_flag = 1;
-				  break;                      // less than 1 data left in buffer, ignore
+		  clearBufferAndStatus();
+		  Uart_enableRXINT();               // reable uart receiver before processing
+		  UartA2_enableRXINT();               // reable uart receiver before processing
+		  if(check_vel_first == 1){         // need to check first 3 volicity digit first, it's follow up bit from last round
+			  velocity_status[0] = cmd_buff[cmd_buff_pos];	// store the hundred's digit
+			  velocity_status[1] = cmd_buff[cmd_buff_pos+1];	// store the ten's digit
+			  velocity_status[2] = cmd_buff[cmd_buff_pos+2];    // store the digit
+			  check_vel_first = 0;          // reset this velocity first check after checking first 3 digits
+			  if(velocity_status[0]<'0'|| velocity_status[0]>'9'
+					  || velocity_status[1]<'0'|| velocity_status[1]>'9'          // if any of these digit is not a valid number, break, go next process
+					  || velocity_status[2]<'0'|| velocity_status[2]>'9'){
+			  }else{
+				  velocity = (velocity_status[0]-'0')*100 + (velocity_status[1]-'0')*10 + (velocity_status[2]-'0'); // calculate the velocity
+				  disp_velocity_status = ON;
 			  }
-			  switch(operation_mode){
-			  case 'c':{
-				  	  	  glitch_check = cmd_buff[cmd_buff_pos];
-				  	  	  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it, restart checking process
-				  	  	  switch(cmd_buff[cmd_buff_pos+1]){
-				  	  	  case 'y': disp_car_status = ON; break;        // display car, on
-				  	  	  case 'n': disp_car_status = OFF; break;		   // display car, off
-				  	  	  default:  disp_car_status = PRE; break;		   // display car, remain last state
-				  	  	  }
-				  	  	  glitch_check = 'd';      // reset glitch_check
-				  	  	  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
-				  	  	  cmd_buff_cnt -= 2;
-				  	  	  break;
-			  	  	   }
-			  case 'p':{
-				  	  	  glitch_check = cmd_buff[cmd_buff_pos];
-						  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
-						  switch(cmd_buff[cmd_buff_pos+1]){
-						  case 'y': disp_people_status = ON; break;        // display car, on
-						  case 'n': disp_people_status = OFF; break;		   // display car, off
-						  default:  disp_people_status = PRE; break;		   // display car, remain last state
-						  }
-						  glitch_check = 'd';      // reset glitch_check
-						  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
-						  cmd_buff_cnt -= 2;
-						  break;
-			  	  	   }
-			  case 'l':{
-				  	  	  glitch_check = cmd_buff[cmd_buff_pos];
-						  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
-						  switch(cmd_buff[cmd_buff_pos+1]){
-						  case 'y': disp_left_status = ON; break;        // display car, on
-						  case 'n': disp_left_status = OFF; break;		   // display car, off
-						  default:  disp_left_status = PRE; break;		   // display car, remain last state
-						  }
-						  glitch_check = 'd';      // reset glitch_check
-						  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
-						  cmd_buff_cnt -= 2;
-						  break;
-			  	  	   }
-			  case 'r':{
-				  	  	  glitch_check = cmd_buff[cmd_buff_pos];
-						  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
-						  switch(cmd_buff[cmd_buff_pos+1]){
-						  case 'y': disp_right_status = ON; break;        // display car, on
-						  case 'n': disp_right_status = OFF; break;		   // display car, off
-						  default:  disp_right_status = PRE; break;		   // display car, remain last state
-						  }
-						  glitch_check = 'd';      // reset glitch_check
-						  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
-						  cmd_buff_cnt -= 2;
-						  break;
-			  	  	   }
-			  case 'v':{
-				  	  	  glitch_check = cmd_buff[cmd_buff_pos];
-						  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
-						  if(cmd_buff_cnt>=5){              // if buffer has already store the info this round
-							  velocity_status[0] = cmd_buff[cmd_buff_pos+2];	// store the hundred's digit
-							  velocity_status[1] = cmd_buff[cmd_buff_pos+3];	// store the ten's digit
-							  velocity_status[2] = cmd_buff[cmd_buff_pos+4];    // store the digit
-							  if(velocity_status[0]<'0'|| velocity_status[0]>'9'
-									  || velocity_status[1]<'0'|| velocity_status[1]>'9'          // if any of these digit is not a valid number, break, go next process
-									  || velocity_status[2]<'0'|| velocity_status[2]>'9') {
-								  cmd_buff_pos += 1;       // move forward position for 1 pos, jump over processed one
-								  cmd_buff_cnt -= 1;
-								  break;
+			  cmd_buff_pos += 3;       // move forward position for 1 pos, jump over processed one
+			  cmd_buff_cnt -= 3;
+		  }
+
+		  // main command detect loop
+		  while(cmd_buff_cnt>0){        // break judge
+			  while(cmd_buff_cnt>0 && (cmd_buff[cmd_buff_pos] != 'c' && cmd_buff[cmd_buff_pos] != 'p'    // detect first valid operation mode char, if no error, should be at pos 0
+								   && cmd_buff[cmd_buff_pos] != 'l' && cmd_buff[cmd_buff_pos] != 'r'     // if all invalid, cnt will go down to 0 and break loop;
+								   && cmd_buff[cmd_buff_pos] != 'v')\
+				   ){
+				  cmd_buff_cnt--;	  // total buff info count -1
+				  cmd_buff_pos++;     // move to the next buff position
+			  }
+			  while(cmd_buff_cnt>0){
+				  operation_mode = cmd_buff[cmd_buff_pos++];        // store the operation mode char
+				  cmd_buff_cnt--;									// buff count -1
+				  if(cmd_buff_cnt<=1){
+					  broken_flag = 1;
+					  break;                      // less than 1 data left in buffer, ignore
+				  }
+				  switch(operation_mode){
+				  case 'c':{
+							  glitch_check = cmd_buff[cmd_buff_pos];
+							  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it, restart checking process
+							  switch(cmd_buff[cmd_buff_pos+1]){
+							  case 'y': disp_car_status = ON; break;        // display car, on
+							  case 'n': disp_car_status = OFF; break;		   // display car, off
+							  default:  disp_car_status = PRE; break;		   // display car, remain last state
 							  }
-							  velocity = (velocity_status[0]-'0')*100 + (velocity_status[1]-'0')*10 + (velocity_status[2]-'0'); // calculate the velocity
-							  disp_velocity_status = ON;
-							  glitch_check = 'd';      // reset glitch_check
-							  cmd_buff_pos += 5;       // move forward position for 2 pos, jump over processed one
-							  cmd_buff_cnt -= 5;
-							  break;
-						  }else{               // if info goes like  "ciypinvi0 + 023" (023 is int next round buffer)
-							  check_vel_first = 1;
 							  glitch_check = 'd';      // reset glitch_check
 							  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
 							  cmd_buff_cnt -= 2;
-						  }
+							  break;
+						   }
+				  case 'p':{
+							  glitch_check = cmd_buff[cmd_buff_pos];
+							  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
+							  switch(cmd_buff[cmd_buff_pos+1]){
+							  case 'y': disp_people_status = ON; break;        // display car, on
+							  case 'n': disp_people_status = OFF; break;		   // display car, off
+							  default:  disp_people_status = PRE; break;		   // display car, remain last state
+							  }
+							  glitch_check = 'd';      // reset glitch_check
+							  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
+							  cmd_buff_cnt -= 2;
+							  break;
+						   }
+				  case 'l':{
+							  glitch_check = cmd_buff[cmd_buff_pos];
+							  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
+							  switch(cmd_buff[cmd_buff_pos+1]){
+							  case 'y': disp_left_status = ON; break;        // display car, on
+							  case 'n': disp_left_status = OFF; break;		   // display car, off
+							  default:  disp_left_status = PRE; break;		   // display car, remain last state
+							  }
+							  glitch_check = 'd';      // reset glitch_check
+							  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
+							  cmd_buff_cnt -= 2;
+							  break;
+						   }
+				  case 'r':{
+							  glitch_check = cmd_buff[cmd_buff_pos];
+							  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
+							  switch(cmd_buff[cmd_buff_pos+1]){
+							  case 'y': disp_right_status = ON; break;        // display car, on
+							  case 'n': disp_right_status = OFF; break;		   // display car, off
+							  default:  disp_right_status = PRE; break;		   // display car, remain last state
+							  }
+							  glitch_check = 'd';      // reset glitch_check
+							  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
+							  cmd_buff_cnt -= 2;
+							  break;
+						   }
+				  case 'v':{
+							  glitch_check = cmd_buff[cmd_buff_pos];
+							  if(glitch_check != 'i') break;        // if no 'i' as second byte income, means broken info, ignore it
+							  if(cmd_buff_cnt>=5){              // if buffer has already store the info this round
+								  velocity_status[0] = cmd_buff[cmd_buff_pos+2];	// store the hundred's digit
+								  velocity_status[1] = cmd_buff[cmd_buff_pos+3];	// store the ten's digit
+								  velocity_status[2] = cmd_buff[cmd_buff_pos+4];    // store the digit
+								  if(velocity_status[0]<'0'|| velocity_status[0]>'9'
+										  || velocity_status[1]<'0'|| velocity_status[1]>'9'          // if any of these digit is not a valid number, break, go next process
+										  || velocity_status[2]<'0'|| velocity_status[2]>'9') {
+									  cmd_buff_pos += 1;       // move forward position for 1 pos, jump over processed one
+									  cmd_buff_cnt -= 1;
+									  break;
+								  }
+								  velocity = (velocity_status[0]-'0')*100 + (velocity_status[1]-'0')*10 + (velocity_status[2]-'0'); // calculate the velocity
+								  disp_velocity_status = ON;
+								  glitch_check = 'd';      // reset glitch_check
+								  cmd_buff_pos += 5;       // move forward position for 2 pos, jump over processed one
+								  cmd_buff_cnt -= 5;
+								  break;
+							  }else{               // if info goes like  "ciypinvi0 + 023" (023 is int next round buffer)
+								  check_vel_first = 1;
+								  glitch_check = 'd';      // reset glitch_check
+								  cmd_buff_pos += 2;       // move forward position for 2 pos, jump over processed one
+								  cmd_buff_cnt -= 2;
+							  }
 
-			  	  	   }
-			  default: {
-				  	  	  break;
-			  	  	   }
+						   }
+				  default: {
+							  break;
+						   }
+				  }
 			  }
+
+			  displayProcess(disp_left_status, disp_right_status, disp_car_status, disp_people_status, disp_velocity_status, velocity);
+			  _nop();
+
 		  }
-
-		  displayProcess(disp_left_status, disp_right_status, disp_car_status, disp_people_status, disp_velocity_status, velocity);
-		  _nop();
-
+	  }
+	  // gps route
+	  if(gps_velocity_ready == 1){
+		  gps_velocity_buff_count = gps_velocity_count;
+		  gps_velocity_count = 0;
+		  Uart_disableRXINT();               // disable uart receiver before processing
+		  UartA2_disableRXINT();               // disable uart receiver before processing
+		  for(loop_tmp=0;loop_tmp<8;loop_tmp++){
+			  gps_velocity_buff[loop_tmp] = gps_velocity[loop_tmp];
+		  }
+		  Uart_enableRXINT();               // reable uart receiver before processing
+		  UartA2_enableRXINT();               // reable uart receiver before processing
+		  gps_velocity_kilometer = getGpsVelocity();
+		  displayVelocity(gps_velocity_kilometer);
+		  gps_velocity_ready = 0;
 	  }
   }
 
@@ -282,8 +322,49 @@ void clearBufferAndStatus(){         // sorry for the name, at the end it won't 
 	  cmd_recv_cnt = 0;
 }
 
+int getGpsVelocity(){
+	int i=0;
+	float gps_vel_int_knot = 0;			// gps velocity int part in knot
+	float gps_vel_digit_knot = 0;		// digit part
+	float gps_vel_knot = 0;				// actual velocity number in knot
+	int gps_vel_kilo = 0;      			// actual velocity number in kilometer
 
-// Echo back RXed character, confirm TX buffer is ready first
+	if(gps_velocity_buff_count == 1) return -1;    // if no signal, gps_velocity will have only one char, is ',' , return -1 indicate no signal
+	while(i < gps_velocity_buff_count - 1 && gps_velocity_buff[i]!='.'){
+		gps_vel_int_knot=gps_vel_int_knot*10 + (gps_velocity_buff[i]-'0');				// get the speed before number point
+		i++;
+	}
+	i++;         // jump over '.'
+	float div = 10;
+	while(i < gps_velocity_buff_count - 1){				// if still has number after '.' , means float number
+		gps_vel_digit_knot = gps_vel_digit_knot + (float)(gps_velocity_buff[i]-'0')/div;
+		div=div*10;
+		i++;
+	}
+	gps_vel_knot = gps_vel_int_knot + gps_vel_digit_knot;
+	gps_vel_kilo = (int)(gps_vel_knot * 1.852);                 // knot to kilometer conversion, only keep integer part
+
+	gps_velocity_buff_count = 0;                  // reset count after get the velocity info
+
+	return gps_vel_kilo;
+}
+
+void transmitGpsVelocity(int gps_vel_kilo){			// sent 3 digit velocity from uart
+	if(gps_vel_kilo != -1){ 			// normal velocity
+		Uart_sendchar('0' + gps_vel_kilo/100);      // send velocity information
+		Uart_sendchar('0' + (gps_vel_kilo/10)%10);      // send velocity information
+		Uart_sendchar('0' + gps_vel_kilo%10);      // send velocity information
+	}else{ 										   // send no signal
+		Uart_sendchar('N');
+		Uart_sendchar('/');
+		Uart_sendchar('A');                        // send 'N/A'
+	}
+
+}
+
+
+
+// read signals from truck by uart0 port, store into buffer
 #pragma vector=USCI_A0_VECTOR
 __interrupt void USCI_A0_ISR(void)
 {
@@ -304,9 +385,63 @@ __interrupt void USCI_A0_ISR(void)
 			  broken_flag = 0;
 		  }
 	  }
-
-
 }
+
+// read gps signals from uart1, only velocity information is needed here
+// gps uart interrupt route
+#pragma vector=USCI_A2_VECTOR
+__interrupt void USCI_A2_ISR(void)
+{
+	//TA1CCTL0 &= ~CCIE;                          // CCR0 interrupt disbaled, prevent timer process during uart
+                                    // Vector 2 - RXIFG
+	  while (!(UCA2IFG&UCRXIFG));             // USCI_A0 TX buffer ready?
+	  gps_recv_char = UCA2RXBUF;       // read info from rx
+	  if(gps_velocity_ready == 1) return;      // if last speed has not been processed, ingore the upcoming stream;
+	  if(gps_recv_char=='$'){   		  // check if it's gps tag start char, NMEA format
+		  gps_tag[0] = gps_recv_char;            // store in gps_tag[0]
+		  gps_tag_flag = 1;				// indicate the next coming 5 chars are gps tag info
+		  return;						// go out and wait for next info
+	  }
+	  if(gps_tag_flag == 1){
+		  gps_tag[gps_tag_count++] = gps_recv_char;
+		  if(gps_tag_count == 6){
+			  gps_tag_count = 1;			// reset count
+			  gps_tag_flag = 0;             // finished getting 5 char gps tag
+			  gps_tag_check_flag = 1;       // gps tag is ready for checking
+		  }
+	  }
+	  if(gps_tag_check_flag == 1){          // if gps tag is ready for check
+		  if(gps_tag[1]=='G' && gps_tag[5]=='C')   // only this tag has velocity information
+		  {
+			  gps_velocity_flag = 1;       // ready for receive velocity info
+			  gps_tag_check_flag = 0;
+			  return;
+		  }else{
+			  gps_tag_check_flag = 0;      // reset gps tag check flag if receive other tags
+			  return;
+		  }
+	  }
+
+	  if(gps_velocity_flag == 1){ 			// checking velovity pre info
+		  if(gps_recv_char == ',') gps_comma_count++;
+		  if(gps_comma_count == 7){				// velocity info come after 7 commas
+			  gps_comma_count = 0;              // reset count
+			  gps_velocity_recv_flag = 1;		// go receive velocity
+			  gps_velocity_flag = 0;           // reset this flag, no longer need to check 7 commas
+			  return;
+		  }
+	  }
+
+	  if(gps_velocity_recv_flag == 1){
+		  gps_velocity[gps_velocity_count++] = gps_recv_char;
+		  if(gps_recv_char == ','){
+			  gps_velocity_recv_flag = 0;
+			  gps_velocity_ready = 1;        // successfully get gps velocity signal
+			  return;
+		  }
+	  }
+}
+
 
 // Timer1 A0 interrupt service routine
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
@@ -328,7 +463,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) TIMER1_A0_ISR (void)
   }else{
 	  beep_gap = 0;
   }
-
 }
 
 

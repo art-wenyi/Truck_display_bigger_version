@@ -457,6 +457,10 @@ void displayRightSide(){                    // display the right side at the rig
 }
 
 void displayVelocity(int velocity){                  // display the velocity
+	if(velocity == -1){
+		displayVelocity(999);
+		return;
+	}
 	unsigned char    *velocity_1_digit=NULL,\
 			 	 	 *velocity_2_digit=NULL, \
 			 	 	 *velocity_3_digit=NULL;					   // set pointers, use for point to the actual pic that should be displayed

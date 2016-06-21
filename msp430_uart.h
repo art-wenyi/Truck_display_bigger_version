@@ -39,6 +39,9 @@
 #define UCAxTXIFG  BIT1
 #define UCAxRXIFG  BIT0        // USCI interrupt flag
 
+#define UCA2TXIFG  BIT1
+#define UCA2RXIFG  BIT0        // USCI interrupt flag
+
 
 
 //== below are function definition===========================
@@ -59,5 +62,20 @@ void Uart_enableRXINT();                      // enable uart RX interrupt
 void Uart_disableRXINT();					  // disable uart RX interrupt
 void Uart_enableTXINT();                      // enable uart TX interrupt
 void Uart_disableTXINT();					  // disable uart TX interrupt
+
+void UartA2_Init(double BaudRate, char parity, char LMSBMode, int bitMode, int stopbitMode);
+void UartA2_setParity(char parity);              // set Parity bit
+void UartA2_setLMSBMode(char LMSBMode);           // set LSB or MSB mode
+void UartA2_setbitMode(int bitMode);                 // set bit mode
+void UartA2_setstopbitMode(int stopbitMode);         // set stop bit mode
+
+void UartA2_sendchar(char zifu);                // send char
+void UartA2_sendstr(char *str);                 // send string
+char UartA2_readchar();                        // reserve function, really don't know how to use, when to read
+
+void UartA2_enableRXINT();                      // enable uart RX interrupt
+void UartA2_disableRXINT();					  // disable uart RX interrupt
+void UartA2_enableTXINT();                      // enable uart TX interrupt
+void UartA2_disableTXINT();					  // disable uart TX interrupt
 
 #endif /* MSP430_UART_H_ */
