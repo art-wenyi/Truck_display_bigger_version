@@ -5,7 +5,7 @@
 #include <msp430f5659.h>
 #include "msp430_uart.h"
 #include "Display.h"
-
+//==============================================================================
 //int data_in_flag = 0;
 char cmd_recv[18]={'d'};               // actual received command from uart
 int cmd_recv_pos=0;								// buffer position, operate as a circular one
