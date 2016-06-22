@@ -255,13 +255,13 @@ void main(void)
 		  Uart_enableRXINT();               // reable uart receiver before processing
 		  UartA2_enableRXINT();               // reable uart receiver before processing
 		  gps_velocity_kilometer = getGpsVelocity();
-		  displayVelocity(gps_velocity_kilometer);
-		  transmitGpsVelocity(gps_velocity_kilometer);
+		  //displayVelocity(gps_velocity_kilometer);
+		  transmitGpsVelocity(gps_velocity_kilometer);		// transmit gps signal to host
 		  gps_velocity_ready = 0;					// reset velocity ready flag, in order to read velocity speed once again
 	  }
   }
 
-}
+}    // end of main process
 
 
 
@@ -283,7 +283,7 @@ void clearBufferAndStatus(){         // sorry for the name, at the end it won't 
 	  cmd_recv_cnt = 0;
 }
 
-int getGpsVelocity(){
+int getGpsVelocity(){ 				// get gps velocity to kilo/h from raw gps signal, return -1 if no signal
 	int i=0;
 	float gps_vel_int_knot = 0;			// gps velocity int part in knot
 	float gps_vel_digit_knot = 0;		// digit part
@@ -310,7 +310,7 @@ int getGpsVelocity(){
 	return gps_vel_kilo;
 }
 
-void transmitGpsVelocity(int gps_vel_kilo){			// sent 3 digit velocity from uart
+void transmitGpsVelocity(int gps_vel_kilo){			// sent 3 digit velocity from uart, either 3 numbers or "N/A"
 	if(gps_vel_kilo != -1){ 			// normal velocity
 		Uart_sendchar('0' + gps_vel_kilo/100);      // send velocity information
 		Uart_sendchar('0' + (gps_vel_kilo/10)%10);      // send velocity information
